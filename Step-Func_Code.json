@@ -1,0 +1,83 @@
+{
+    "Comment": "A description of my state machine",
+    "StartAt": "StartCrawler",
+    "States": {
+      "StartCrawler": {
+        "Type": "Task",
+        "Parameters": {
+          "Name": "airline-s3-flight-crawler"
+        },
+        "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
+        "Next": "GetCrawler"
+      },
+      "GetCrawler": {
+        "Type": "Task",
+        "Parameters": {
+          "Name": "airline-s3-flight-crawler"
+        },
+        "Resource": "arn:aws:states:::aws-sdk:glue:getCrawler",
+        "Next": "Is_Running?"
+      },
+      "Is_Running?": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.Crawler.State",
+            "StringMatches": "RUNNING",
+            "Next": "Wait"
+          }
+        ],
+        "Default": "Glue StartJobRun"
+      },
+      "Wait": {
+        "Type": "Wait",
+        "Seconds": 5,
+        "Next": "GetCrawler"
+      },
+      "Glue StartJobRun": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::glue:startJobRun.sync",
+        "Parameters": {
+          "JobName": "Flight-Data-Ingestion-Pipeline"
+        },
+        "Next": "Glue Job Status",
+        "Catch": [
+          {
+            "ErrorEquals": [
+              "States.TaskFailed"
+            ],
+            "Next": "Failed Notification"
+          }
+        ]
+      },
+      "Glue Job Status": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.JobRunState",
+            "StringMatches": "SUCCEEDED",
+            "Next": "Success Notification"
+          }
+        ],
+        "Default": "Failed Notification"
+      },
+      "Failed Notification": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::sns:publish",
+        "Parameters": {
+          "Message.$": "$",
+          "TopicArn": "arn:aws:sns:us-east-1:010526265053:glue-job-notification"
+        },
+        "End": true
+      },
+      "Success Notification": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::sns:publish",
+        "Parameters": {
+          "TopicArn": "arn:aws:sns:us-east-1:010526265053:glue-job-notification",
+          "Message": "Glue Job Execution Successful!!"
+        },
+        "End": true
+      }
+    }
+  }
