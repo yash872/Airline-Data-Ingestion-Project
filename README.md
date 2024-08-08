@@ -7,7 +7,7 @@ An airline daily data ingestion project using S3, S3 Cloudtrail Notification, Ev
 ***
 
 ## Architectural Diagram
-![Event-Driven-SalesDataPipeline Architecture](https://github.com/yash872/Airline-Data-Ingestion-Project/blob/main/Images/Event-Driven-SalesDataPipeline.jpg)
+![AirlineProject](https://github.com/yash872/Airline-Data-Ingestion-Project/blob/main/Images/AirlineProject.jpg)
 
 ***
 
@@ -72,6 +72,10 @@ An airline daily data ingestion project using S3, S3 Cloudtrail Notification, Ev
 - State Machine Run
 ![StateMachineSuccess](https://github.com/yash872/Airline-Data-Ingestion-Project/blob/main/Images/StateMachineSuccess.JPG)
 
-### 9. Output Data in Redshift
+### 9. Output
+- we can see the Success Notification in your subscribed mail box 
+![mailNoti](https://github.com/yash872/Airline-Data-Ingestion-Project/blob/main/Images/mailNoti.JPG)
+
+
 - we can the output data stored in Redshift fact table.
 ![factData](https://github.com/yash872/Airline-Data-Ingestion-Project/blob/main/Images/factData.JPG)
